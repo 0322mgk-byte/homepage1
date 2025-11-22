@@ -5,6 +5,7 @@ import Curriculum from '@/components/sections/Curriculum';
 import SignUpForm from '@/components/sections/SignUpForm';
 import Footer from '@/components/sections/Footer';
 import ScrollToTop from '@/components/sections/ScrollToTop';
+import ChatBot from '@/components/chatbot/ChatBot';
 
 export default function Home() {
   return (
@@ -18,6 +19,7 @@ export default function Home() {
       </main>
       <Footer />
       <ScrollToTop />
+      <ChatBot />
     </>
   );
 }
