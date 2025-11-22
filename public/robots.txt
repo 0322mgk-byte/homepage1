@@ -1,3 +1,9 @@
+# *
 User-agent: *
 Allow: /
+
+# Host
+Host: https://testlanding3.vercel.app
+
+# Sitemaps
 Sitemap: https://testlanding3.vercel.app/sitemap.xml
