@@ -9,11 +9,17 @@ interface Message {
   parts: { text: string }[];
 }
 
+// 세션 ID 생성 함수
+const generateSessionId = () => {
+  return `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+};
+
 export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [sessionId] = useState(() => generateSessionId());
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -43,6 +49,7 @@ export default function ChatBot() {
         body: JSON.stringify({
           message: input,
           history: messages,
+          sessionId: sessionId,
         }),
       });
 

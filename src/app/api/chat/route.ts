@@ -2,6 +2,23 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+// 기존 폼 URL과 동일하게 사용 (통합 Apps Script)
+const GOOGLE_SCRIPT_URL = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL || "";
+
+// Google Sheets에 대화 내용 저장
+async function saveToSheets(sessionId: string, role: string, message: string, ip: string) {
+  if (!GOOGLE_SCRIPT_URL) return;
+
+  try {
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId, role, message, ip, type: "chat" }),
+    });
+  } catch (error) {
+    console.error("Failed to save chat to sheets:", error);
+  }
+}
 
 const SYSTEM_PROMPT = `당신은 "AI MONEY" 무료 특강의 친절한 상담 도우미입니다.
 
@@ -28,7 +45,10 @@ const SYSTEM_PROMPT = `당신은 "AI MONEY" 무료 특강의 친절한 상담 �
 
 export async function POST(req: NextRequest) {
   try {
-    const { message, history } = await req.json();
+    const { message, history, sessionId } = await req.json();
+
+    // 사용자 IP 가져오기
+    const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
 
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
@@ -36,6 +56,9 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
+
+    // 사용자 메시지 저장
+    await saveToSheets(sessionId || "unknown", "user", message, ip);
 
     const model = genAI.getGenerativeModel({
       model: "gemini-2.5-flash",
@@ -49,6 +72,9 @@ export async function POST(req: NextRequest) {
     const result = await chat.sendMessage(message);
     const response = await result.response;
     const text = response.text();
+
+    // AI 응답 저장
+    await saveToSheets(sessionId || "unknown", "model", text, ip);
 
     return NextResponse.json({ response: text });
   } catch (error) {
