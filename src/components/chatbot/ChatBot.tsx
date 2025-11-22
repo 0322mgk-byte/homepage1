@@ -90,9 +90,15 @@ export default function ChatBot() {
       {/* Chat Toggle Button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-r from-primary to-purple-500 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform"
-        whileHover={{ scale: 1.1 }}
+        className="fixed bottom-8 right-8 z-[9999] w-16 h-16 bg-gradient-to-r from-primary to-purple-500 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform ring-4 ring-primary/30"
+        whileHover={{ scale: 1.15 }}
         whileTap={{ scale: 0.95 }}
+        animate={{
+          boxShadow: isOpen
+            ? "0 0 0 0 rgba(107, 70, 193, 0)"
+            : ["0 0 0 0 rgba(107, 70, 193, 0.4)", "0 0 0 20px rgba(107, 70, 193, 0)", "0 0 0 0 rgba(107, 70, 193, 0.4)"]
+        }}
+        transition={{ duration: 2, repeat: Infinity }}
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
@@ -102,7 +108,7 @@ export default function ChatBot() {
               animate={{ rotate: 0, opacity: 1 }}
               exit={{ rotate: 90, opacity: 0 }}
             >
-              <X className="w-6 h-6 text-white" />
+              <X className="w-7 h-7 text-white" />
             </motion.div>
           ) : (
             <motion.div
@@ -111,11 +117,26 @@ export default function ChatBot() {
               animate={{ rotate: 0, opacity: 1 }}
               exit={{ rotate: -90, opacity: 0 }}
             >
-              <MessageCircle className="w-6 h-6 text-white" />
+              <MessageCircle className="w-7 h-7 text-white" />
             </motion.div>
           )}
         </AnimatePresence>
       </motion.button>
+
+      {/* Tooltip when closed */}
+      <AnimatePresence>
+        {!isOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 10 }}
+            className="fixed bottom-10 right-28 z-[9999] bg-white text-gray-900 px-4 py-2 rounded-lg shadow-lg text-sm font-medium"
+          >
+            무엇이든 물어보세요!
+            <div className="absolute right-[-8px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-8 border-b-8 border-l-8 border-transparent border-l-white" />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Chat Window */}
       <AnimatePresence>
@@ -124,7 +145,7 @@ export default function ChatBot() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-24 right-6 z-50 w-[350px] h-[500px] bg-gray-900 rounded-2xl shadow-2xl border border-gray-700 flex flex-col overflow-hidden"
+            className="fixed bottom-28 right-8 z-[9999] w-[350px] h-[500px] bg-gray-900 rounded-2xl shadow-2xl border border-gray-700 flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-primary to-purple-500 px-4 py-3 flex items-center gap-3">
