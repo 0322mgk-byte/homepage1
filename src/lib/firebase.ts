@@ -1,7 +1,7 @@
-import { initializeApp, getApps } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
-import { getStorage } from 'firebase/storage';
+import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
+import { getFirestore, Firestore } from 'firebase/firestore';
+import { getAuth, Auth } from 'firebase/auth';
+import { getStorage, FirebaseStorage } from 'firebase/storage';
 
 // Firebase 설정
 const firebaseConfig = {
@@ -14,16 +14,21 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-// Firebase 앱 초기화 (중복 방지)
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+// Firebase 앱 초기화 (환경변수가 없을 때 안전하게 처리)
+let app: FirebaseApp | undefined;
+let db: Firestore;
+let auth: Auth;
+let storage: FirebaseStorage;
 
-// Firestore 데이터베이스
-export const db = getFirestore(app);
+if (firebaseConfig.apiKey) {
+  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+  db = getFirestore(app);
+  auth = getAuth(app);
+  storage = getStorage(app);
+} else {
+  // 빌드 시 환경변수가 없을 수 있으므로 더미 초기화
+  console.warn('Firebase config is missing. Firebase features will not work.');
+}
 
-// Firebase 인증
-export const auth = getAuth(app);
-
-// Firebase Storage
-export const storage = getStorage(app);
-
+export { db, auth, storage };
 export default app;
