@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
       userId: session.user.email,
       userName: session.user.name || '익명 사용자',
       userEmail: session.user.email,
-      userImage: session.user.image || undefined,
+      ...(session.user.image && { userImage: session.user.image }),
       rating,
       content: content.trim(),
       images: images || [],
